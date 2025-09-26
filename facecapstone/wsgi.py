@@ -1,23 +1,19 @@
-"""
-WSGI config for facecapstone project.
-
-It exposes the WSGI callable as a module-level variable named ``application``.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/5.2/howto/deployment/wsgi/
-"""
-
 import os
 import sys
 
-# Add project folder (where manage.py lives)
-path = '/home/Jade07/Face_Matching'
-if path not in sys.path:
-    sys.path.append(path)
+# Add your project folder to the Python path
+project_home = '/home/Jade07/Face_Matching'
+if project_home not in sys.path:
+    sys.path.append(project_home)
 
-# Set settings module
+# Set Django settings module
 os.environ['DJANGO_SETTINGS_MODULE'] = 'facecapstone.settings'
 
-# Initialize application
+# Activate virtualenv
+activate_this = '/home/Jade07/Face_Matching/venv/bin/activate_this.py'
+with open(activate_this) as f:
+    exec(f.read(), {'__file__': activate_this})
+
+# Initialize WSGI application
 from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()
