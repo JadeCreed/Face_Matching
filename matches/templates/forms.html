@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Forms - Admin{% endblock %}
+{% block content %}
+<section class="page">
+  <h1 class="page-title">FORMS</h1>
+
+  <div class="card form-card">
+    <form method="post" action="{% url 'forms' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="row">
+        <label>First Name</label><input type="text" name="first_name">
+        <label>Last Name</label><input type="text" name="last_name">
+        <label>M.I.</label><input type="text" name="middle_initial">
+        <label>ID Number</label><input type="text" name="id_number">
+        <label>Year / Section</label><input type="text" name="year_section">
+      </div>
+      <div class="row">
+        <label>Photo</label>
+        <input type="file" name="photo" accept="image/*">
+      </div>
+      <button type="submit" class="btn primary">Submit</button>
+    </form>
+  </div>
+
+  {% if match_result %}
+    <div class="match-box">
+      {% if match_result.status == 'matched' %}
+        ✅ Match found: {{ match_result.student.first_name }} {{ match_result.student.last_name }} — similarity: {{ match_result.distance }}
+      {% else %}
+        ❌ {{ match_result.message }}
+      {% endif %}
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

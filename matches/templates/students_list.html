@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+{% block title %}Students List{% endblock %}
+{% block content %}
+<section class="page">
+  <h1 class="page-title">STUDENTS LIST</h1>
+
+  <div class="top-actions">
+    <!-- Upload Photos -->
+    <form id="uploadPhotosForm" action="{% url 'upload_photos' %}" method="post" enctype="multipart/form-data" style="display:inline-block;">
+      {% csrf_token %}
+      <input type="file" name="photos" id="photosInput" accept="image/*" multiple style="display:none">
+      <button type="button" class="btn" onclick="document.getElementById('photosInput').click()">UPLOAD</button>
+    </form>
+
+    <!-- Delete Button -->
+    <button class="btn" id="deleteBtn" type="button">DELETE</button>
+
+    <!-- Sort Dropdown -->
+    <div class="sort-dropdown" style="display:inline-block; position:relative;">
+      <button class="btn">SORT ▼</button>
+      <div class="dropdown-content" id="sortOptions" style="display:none; position:absolute; border:1px solid #ccc;">
+        <div class="sort-option" data-column="1">ID</div>
+        <div class="sort-option" data-column="2">First Name</div>
+        <div class="sort-option" data-column="3">Last Name</div>
+        <div class="sort-option" data-column="5">Year-Section</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Form -->
+  <form id="deleteForm" method="post" action="{% url 'delete_students' %}">
+    {% csrf_token %}
+    <div class="table-wrap">
+      <table class="students-table" id="studentsTable">
+        <thead>
+          <tr>
+            <th class="checkbox-column" style="display:none;"></th>
+            <th>PHOTO</th>
+            <th>ID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>M.</th>
+            <th>Year - Section</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in students %}
+          <tr>
+            <td class="checkbox-column" style="display:none;">
+              <input type="checkbox" name="selected_students" value="{{ s.id }}">
+            </td>
+            <td class="photo-cell">
+              {% if s.photo %}
+                <img src="{{ s.photo.url }}" 
+                     alt="photo" 
+                     data-id="{{ s.id }}"  
+                     class="student-photo" 
+                     style="cursor:pointer; width:80px; border-radius:6px;" />
+              {% else %}
+                <div class="placeholder"></div>
+              {% endif %}
+            </td>
+            <td>{{ s.id_number }}</td>
+            <td>{{ s.first_name }}</td>
+            <td>{{ s.last_name }}</td>
+            <td>{{ s.middle_initial }}</td>
+            <td>{{ s.year_section }}</td>
+            <td>
+              {% if s.status == 'completed' %}<span class="dot ok"></span> Completed{% endif %}
+              {% if s.status == 'not_yet' %}Not yet{% endif %}
+              {% if s.status == 'no' %}No{% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </form>
+</section>
+
+<!-- Modal -->
+<div id="compareModal" class="modal" 
+     style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
+            background:rgba(0,0,0,0.85); justify-content:center; align-items:center; z-index:1000;">
+
+  <div class="modal-content" 
+       style="background:linear-gradient(135deg,#4e0eff,#2a0845); border-radius:16px; padding:30px; 
+              width:85%; max-width:950px; display:flex; flex-direction:column; position:relative; color:white;">
+
+    <!-- Close button -->
+    <span class="close-btn" 
+          style="position:absolute; top:15px; right:20px; cursor:pointer; font-size:28px;">&times;</span>
+
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:30px;">
+
+      <!-- Left: Form Photo -->
+      <div style="text-align:center; flex:1;">
+        <img id="formPhoto" src="" 
+             style="width:240px; height:300px; object-fit:cover; border-radius:12px; box-shadow:0 0 15px rgba(0,0,0,0.5);">
+        <p id="formName" style="font-weight:bold; margin-top:10px; font-size:18px;"></p>
+        <p id="formSection" style="opacity:0.9; font-size:16px;"></p>
+      </div>
+
+      <!-- Middle: Status -->
+      <div style="text-align:center; flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+        <div id="matchIcon" style="font-size:60px; margin-bottom:10px;">✅</div>
+        <h2 id="matchStatus" style="font-size:28px; margin:10px 0;">Match</h2>
+        <p id="matchAccuracy" style="font-size:20px; font-weight:600; color:#a6ffb5;"></p>
+      </div>
+
+      <!-- Right: Clicked Student Photo -->
+      <div style="text-align:center; flex:1;">
+        <img id="clickedPhoto" src="" 
+             style="width:240px; height:300px; object-fit:cover; border-radius:12px; box-shadow:0 0 15px rgba(0,0,0,0.5);">
+        <p id="clickedName" style="font-weight:bold; margin-top:10px; font-size:18px;"></p>
+        <p id="clickedSection" style="opacity:0.9; font-size:16px;"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// ------------------------
+// Upload Photos auto-submit
+// ------------------------
+document.getElementById('photosInput').addEventListener('change', function(){
+    if(this.files.length > 0){
+        document.getElementById('uploadPhotosForm').submit();
+    }
+});
+
+// ------------------------
+// Delete button logic
+// ------------------------
+const deleteBtn = document.getElementById('deleteBtn');
+let showCheckboxes = false;
+deleteBtn.addEventListener('click', function() {
+    const checkboxes = document.querySelectorAll('.checkbox-column');
+    showCheckboxes = !showCheckboxes;
+    checkboxes.forEach(cb => cb.style.display = showCheckboxes ? 'table-cell' : 'none');
+
+    if (!showCheckboxes) {
+        document.getElementById('deleteForm').submit();
+    }
+});
+
+// ------------------------
+// Sort Dropdown logic
+// ------------------------
+const sortBtn = document.querySelector('.sort-dropdown button');
+const sortOptions = document.getElementById('sortOptions');
+sortBtn.addEventListener('click', () => {
+    sortOptions.style.display = sortOptions.style.display === 'block' ? 'none' : 'block';
+});
+
+document.querySelectorAll('.sort-option').forEach(opt => {
+    opt.addEventListener('click', function(){
+        const colIndex = parseInt(this.dataset.column);
+        const table = document.getElementById('studentsTable');
+        const tbody = table.tBodies[0];
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+
+        rows.sort((a,b) => {
+            const aText = a.cells[colIndex].innerText.toLowerCase();
+            const bText = b.cells[colIndex].innerText.toLowerCase();
+            return aText.localeCompare(bText);
+        });
+
+        rows.forEach(r => tbody.appendChild(r));
+        sortOptions.style.display = 'none';
+    });
+});
+
+document.addEventListener('click', function(event){
+    if (!sortBtn.contains(event.target) && !sortOptions.contains(event.target)) {
+        sortOptions.style.display = 'none';
+    }
+});
+
+// ------------------------
+// Compare Photo Popup Logic
+// ------------------------
+document.addEventListener("DOMContentLoaded", function() {
+    const modal = document.getElementById("compareModal");
+    const closeBtn = modal.querySelector(".close-btn");
+
+    document.querySelectorAll(".student-photo").forEach(photo => {
+        photo.addEventListener("click", function() {
+            const studentId = this.dataset.id;
+
+            fetch(`/match-detail/${studentId}/`)
+              .then(res => res.json())
+              .then(data => {
+                  if (data.error) {
+                      alert(data.error);
+                      return;
+                  }
+
+                  // Left side = form photo
+                  document.getElementById("formPhoto").src = data.form_photo || data.clicked_photo || "";
+                  document.getElementById("formName").innerText = data.name || "";
+                  document.getElementById("formSection").innerText = data.section || "";
+
+                  // Right side = clicked student photo
+                  document.getElementById("clickedPhoto").src = data.clicked_photo || "";
+                  document.getElementById("clickedName").innerText = data.name || "";
+                  document.getElementById("clickedSection").innerText = data.section || "";
+
+                  // Middle status
+                  document.getElementById("matchStatus").innerText = data.status;
+                  document.getElementById("matchAccuracy").innerText = `Accuracy: ${data.accuracy}`;
+
+                  modal.style.display = "flex";
+              })
+              .catch(err => console.error("Error fetching match detail:", err));
+        });
+    });
+
+    closeBtn.onclick = () => modal.style.display = "none";
+    window.onclick = e => { if (e.target == modal) modal.style.display = "none"; };
+});
+</script>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{% block title %}Admin - Face Match{% endblock %}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="gradient-bg">
+  <div class="app">
+    <aside class="sidebar">
+      <div class="logo">ADMIN</div>
+      <nav class="menu">
+        <a href="{% url 'forms' %}" class="menu-item">FORMS</a>
+        <a href="{% url 'students_list' %}" class="menu-item">STUDENTS</a>
+      </nav>
+    </aside>
+    <main class="main">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+  <script src="{% static 'matches/js/main.js' %}"></script>
+</body>
+</html>
