@@ -26,7 +26,10 @@ SECRET_KEY = 'django-insecure-=kj297h2q4sj+hf&c0^(&n6k$q8fw1)85^nufue7ly-c^03*d4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['Tripixcreed07.pythonanywhere.com']
+ALLOWED_HOSTS = [
+    'Tripixcreed07.pythonanywhere.com',  # your main domain
+    'www.Tripixcreed07.pythonanywhere.com',  # optional, if you might use www
+]
 
 
 
