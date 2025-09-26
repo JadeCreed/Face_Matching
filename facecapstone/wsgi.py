@@ -11,7 +11,7 @@ import os
 import sys
 
 # Add project folder (where manage.py lives)
-path = '/home/Tripixcreed07/Face_Matching'
+path = '/home/Jade07/Face_Matching'
 if path not in sys.path:
     sys.path.append(path)
 
