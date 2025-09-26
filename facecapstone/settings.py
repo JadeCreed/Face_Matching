@@ -24,11 +24,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-=kj297h2q4sj+hf&c0^(&n6k$q8fw1)85^nufue7ly-c^03*d4'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
     'Jade07.pythonanywhere.com',
     'www.Jade07.pythonanywhere.com',
+
 ]
 
 
@@ -121,7 +122,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = Path('/home/Jade07/ID_Matching/staticfiles') # where collectstatic puts files
+STATIC_ROOT = Path('/home/Jade07/Face_Matching/staticfiles') # where collectstatic puts files
 STATICFILES_DIRS = [BASE_DIR / 'matches' / 'static']  # your app static files
 
 MEDIA_URL = '/media/'
