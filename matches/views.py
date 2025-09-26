@@ -141,7 +141,7 @@ def predict_face_with_recognizer(face):
 # ---------------- Views (preserve original endpoints) ----------------
 def students_list(request):
     students = Student.objects.all()
-    return render(request, 'students_list.html', {'students': students})
+    return render(request, 'matches/students_list.html', {'students': students})
 
 def submit_student(request):
     """
@@ -164,7 +164,7 @@ def submit_student(request):
         img = read_image_from_path_or_file(photo)
         face = detect_face_cascade(img)
         if face is None:
-            return render(request, 'forms.html', {'match_result': {'status':'not_matched','message':'No face detected'}})
+            return render(request, 'matches/forms.html', {'match_result': {'status':'not_matched','message':'No face detected'}})
 
         # Predict using recognizer
         matched_student, confidence = predict_face_with_recognizer(face)
@@ -192,9 +192,9 @@ def submit_student(request):
             # No match found (preserve your original behavior)
             match_result = {'status':'not_matched','message':'No match found', 'confidence': confidence}
 
-        return render(request, 'forms.html', {'match_result': match_result})
+        return render(request, 'matches/forms.html', {'match_result': match_result})
 
-    return render(request, 'forms.html')
+    return render(request, 'matches/forms.html')
 
 def upload_photos(request):
     """

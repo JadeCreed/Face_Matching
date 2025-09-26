@@ -1,4 +1,5 @@
 Django==5.2.6
-numpy
-Pillow
-opencv-contrib-python
+numpy==2.2.6
+opencv-python-headless==4.12.0.88
+deepface==0.0.95
+Pillow==11.3.0
