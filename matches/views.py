@@ -203,11 +203,14 @@ def upload_photos(request):
     if request.method == 'POST' and request.FILES.getlist('photos'):
         files = request.FILES.getlist('photos')
         for f in files:
-            # Create a new student record with only photo; fields empty — status 'no'
             Student.objects.create(photo=f, status='no')
 
-        # Retrain recognizer after adding photos
-        train_recognizer()
+        # Retrain recognizer safely
+        try:
+            train_recognizer()
+        except Exception as e:
+            # Log the error but do not crash
+            print(f"Error retraining recognizer: {e}")
 
     return redirect('students_list')
 
